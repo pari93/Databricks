@@ -1,0 +1,53 @@
+resources:
+  jobs:
+    E_Commerce_Full_Load_Job:
+      name: E-Commerce_Full_Load_Job
+      tasks:
+        - task_key: Environment_Setup
+          notebook_task:
+            notebook_path: /Workspace/Users/parichhaparitosh@gmail.com/Data
+              Engineering/Projects/E-Commerce
+              Project/01.NB_Platform_Creation_Commands
+            source: WORKSPACE
+        - task_key: Raw_To_Bronze
+          depends_on:
+            - task_key: Environment_Setup
+          notebook_task:
+            notebook_path: /Workspace/Users/parichhaparitosh@gmail.com/Data
+              Engineering/Projects/E-Commerce
+              Project/02.NB_Raw_To_Bronze_Data_Process
+            source: WORKSPACE
+        - task_key: Bronze_To_Silver
+          depends_on:
+            - task_key: Raw_To_Bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/parichhaparitosh@gmail.com/Data
+              Engineering/Projects/E-Commerce
+              Project/03.NB_Bronze_To_Silver_Data_Process
+            source: WORKSPACE
+        - task_key: Silver_To_Gold
+          depends_on:
+            - task_key: Bronze_To_Silver
+          notebook_task:
+            notebook_path: /Workspace/Users/parichhaparitosh@gmail.com/Data
+              Engineering/Projects/E-Commerce
+              Project/04.NB_Silver_To_Gold_Data_Process
+            source: WORKSPACE
+        - task_key: Fact_Table_Creation
+          depends_on:
+            - task_key: Silver_To_Gold
+          notebook_task:
+            notebook_path: /Workspace/Users/parichhaparitosh@gmail.com/Data
+              Engineering/Projects/E-Commerce
+              Project/05.NB_Fact_Table_Data_Process
+            source: WORKSPACE
+        - task_key: Create_Fact_View_For_BI
+          depends_on:
+            - task_key: Fact_Table_Creation
+          sql_task:
+            query:
+              query_id: b3212be0-904f-4d70-9bd3-86626d007be1
+            warehouse_id: fc20a87ebd7e957c
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
