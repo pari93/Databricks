@@ -3,7 +3,7 @@
 -- =====================================================================
 WITH date_range AS (
     SELECT
-        -- Set your own start & end dates
+        -- Set your own start & end dates and also the currency/DBU related parameters below in CTE 7 & 11
         DATE('2026-03-16') AS start_date,
         DATE('2026-04-14') AS end_date
 ),
@@ -75,8 +75,13 @@ dlt_clusters AS (
 dlt_cost_estimate AS (
     SELECT
         COUNT(*) AS num_dlt_clusters,
-        COUNT(*) * 6 AS approx_dbu_hours,
-        (COUNT(*) * 6) * 81.86 AS approx_cost_in_inr
+        COUNT(*) * 6 AS approx_dbu_hours, 
+        --A typical run lasts 20–40 minutes 
+        -- Jobs Compute clusters often use 8–16 DBUs/hour 
+        -- So DBU‑hours ≈ duration × DBUs/hour → ~0.5 hr × 12 DBUs/hr ≈ 6 DBU‑hours
+        (COUNT(*) * 6) * 81.86 AS approx_cost_in_inr 
+        -- Jobs Compute price (West Europe): $0.90 per DBU‑hour 
+        -- 0.90 × 90.96 [**Replace with your currency against US dollar] = ₹81.86 per DBU‑hour
     FROM dlt_clusters
 ),
 
@@ -131,7 +136,9 @@ warehouse_cost AS (
     SELECT
         warehouse_id,
         SUM(minutes) AS total_active_minutes,
-        (SUM(minutes) / 60.0) * 4 * 63.67 AS estimated_cost_in_inr
+        (SUM(minutes) / 60.0) * 4 * 63.67 AS estimated_cost_in_inr 
+        -- 2X‑Small Serverless SQL Warehouse consumes 4 DBUs per hour hence 4 
+        -- Serverless SQL price (West Europe): $0.70 per DBU‑hour so 0.70 × 90.96 [**Replace with your currency against US dollar] = ₹63.67 per DBU-hour
     FROM warehouse_filtered
     GROUP BY warehouse_id
 )
